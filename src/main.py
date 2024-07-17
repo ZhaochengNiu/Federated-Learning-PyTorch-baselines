@@ -117,7 +117,10 @@ if __name__ == '__main__':
     # Load datasets and splits
     if not args.resume:
         # 如果 args.resume 参数为 False（即不是从检查点恢复训练），则执行以下代码块。
-        datasets = getattr(datasets, args.dataset)(args, args.dataset_args)
+        # cifar
+        # datasets = getattr(datasets, args.dataset)(args, args.dataset_args)
+        # mnist
+        datasets = getattr(datasets, args.dataset)(args)
         # 根据 args.dataset 参数的值，动态获取 datasets 模块中相应的数据集类，并使用该类创建数据集实例。
         # args.dataset_args 可能包含一些额外的参数，用于初始化数据集。
         splits = get_splits(datasets, args.num_clients, args.iid, args.balance)
