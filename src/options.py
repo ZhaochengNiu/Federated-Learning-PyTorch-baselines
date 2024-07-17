@@ -28,6 +28,85 @@ from torch.cuda import device_count
 
 import datasets, models, optimizers, schedulers
 
+# usage: python main.py [ARGUMENTS]
+#
+# algorithm arguments:
+
+#   --iters ITERS         number of iterations: the iterations of a round are
+#                         determined by the client with the largest number of
+#                         images (default: None)
+#   --num_clients NUM_CLIENTS, -K NUM_CLIENTS
+#                         number of clients (default: 100)
+#   --frac_clients FRAC_CLIENTS, -C FRAC_CLIENTS
+#                         fraction of clients selected at each round (default:
+#                         0.1)
+#   --train_bs TRAIN_BS, -B TRAIN_BS
+#                         client training batch size, 0 to use the whole
+#                         training set (default: 50)
+#   --epochs EPOCHS, -E EPOCHS
+#                         number of client epochs (default: 5)
+#   --hetero HETERO       probability of clients being stragglers, i.e. training
+#                         for less than EPOCHS epochs (default: 0)
+#   --drop_stragglers     drop stragglers (default: False)
+#   --server_lr SERVER_LR
+#                         server learning rate (default: 1)
+#   --server_momentum SERVER_MOMENTUM
+#                         server momentum for FedAvgM algorithm (default: 0)
+#   --mu MU               mu parameter for FedProx algorithm (default: 0)
+#   --centralized         use centralized algorithm (default: False)
+#   --fedsgd              use FedSGD algorithm (default: False)
+#   --fedir               use FedIR algorithm (default: False)
+#   --vc_size VC_SIZE     use FedVC algorithm with virtual client size VC_SIZE
+#                         (default: None)
+#
+# dataset and split arguments:
+#   --dataset {cifar10,fmnist,mnist}
+#                         dataset, place yours in datasets.py (default: cifar10)
+#   --dataset_args DATASET_ARGS
+#                         dataset arguments (default: augment=True)
+#   --frac_valid FRAC_VALID
+#                         fraction of the training set to use for validation
+#                         (default: 0)
+#   --iid IID             identicalness of client distributions (default: inf)
+#   --balance BALANCE     balance of client distributions (default: inf)
+#
+# model, optimizer and scheduler arguments:
+#   --model {cnn_cifar10,cnn_mnist,efficientnet,ghostnet,lenet5,lenet5_orig,mlp_mnist,mnasnet,mobilenet_v3}
+#                         model, place yours in models.py (default: lenet5)
+#   --model_args MODEL_ARGS
+#                         model arguments (default: ghost=True,norm=None)
+#   --optim {adam,sgd}    optimizer, place yours in optimizers.py (default: sgd)
+#   --optim_args OPTIM_ARGS
+#                         optimizer arguments (default:
+#                         lr=0.01,momentum=0,weight_decay=4e-4)
+#   --sched {const,fixed,plateau_loss,step}
+#                         scheduler, place yours in schedulers.py (default:
+#                         fixed)
+#   --sched_args SCHED_ARGS
+#                         scheduler arguments (default: None)
+#
+# output arguments:
+#   --client_stats_every CLIENT_STATS_EVERY
+#                         compute and print client statistics every
+#                         CLIENT_STATS_EVERY batches, 0 for every epoch
+#                         (default: 0)
+#   --server_stats_every SERVER_STATS_EVERY
+#                         compute, print and log server statistics every
+#                         SERVER_STATS_EVERY rounds (default: 1)
+#   --name NAME           log to runs/NAME and save checkpoints to save/NAME,
+#                         None for YYYY-MM-DD_HH-MM-SS (default: None)
+#   --no_log              disable logging (default: False)
+#   --no_save             disable checkpoints (default: False)
+#   --quiet, -q           less verbose output (default: False)
+#
+# other arguments:
+#   --test_bs TEST_BS     client test/validation batch size (default: 256)
+#   --seed SEED           random seed (default: 0)
+#   --device {cuda:0,cpu}
+#                         device to train/validate/test with (default: cuda:0)
+#   --resume              resume experiment from save/NAME checkpoint (default:
+#                         False)
+#   --help, -h            show this help message and exit (default: False)
 
 def args_parser():
     #max_help_position=1000, width=1000
@@ -38,6 +117,8 @@ def args_parser():
     args_algo = parser.add_argument_group('algorithm arguments')
 
     args_algo_rounds_iters = args_algo.add_mutually_exclusive_group()
+    #   --rounds ROUNDS
+    #   number of communication rounds, or number of epochs if --centralized (default: 200)
     args_algo_rounds_iters.add_argument('--rounds', type=int, default=200,
                         help="number of communication rounds, or number of epochs if --centralized")
     args_algo_rounds_iters.add_argument('--iters', type=int, default=None,
