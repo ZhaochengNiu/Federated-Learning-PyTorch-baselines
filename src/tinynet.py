@@ -10,6 +10,7 @@ from timm.models.efficientnet import EfficientNet, EfficientNetFeatures, _cfg
 from timm.models.registry import register_model
 from timm.models.layers import Swish
 
+
 def _gen_tinynet(variant_cfg, channel_multiplier=1.0, depth_multiplier=1.0, depth_trunc='round', **kwargs):
     """Creates a TinyNet model.
     """

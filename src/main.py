@@ -318,66 +318,89 @@ if __name__ == '__main__':
         # 获取当前的学习率
         if len(updates) > 0:
             # Update server model
-            # 如果存在客户端更新，执行服务器模型更新。
+            # 如果存在客户端更新（即 updates 列表不为空），则执行以下代码块。
             update_avg = average_updates(updates, num_examples)
-
+            # 调用 average_updates 函数计算所有客户端更新的平均值。这个函数可能接受客户端模型更新和对应的样本数量作为参数。
             if v is None:
                 v = deepcopy(update_avg)
             else:
                 for key in v.keys():
                     v[key] = update_avg[key] + v[key] * args.server_momentum
+            # 如果 v 是 None（在第一次迭代时），则将其初始化为 update_avg 的深拷贝。
+            # 否则，对于每个参数键，更新 v 的值为 update_avg 中的相应值加上 v 中的旧值乘以服务器动量 args.server_momentum。
             #new_weights = deepcopy(model.state_dict())
             #for key in new_weights.keys():
             #new_weights[key] = new_weights[key] - v[key] * args.server_lr
             #model.load_state_dict(new_weights)
+            # 这部分代码被注释掉了，但它的意图是创建服务器模型的新权重，通过从当前模型权重中减去 v 中的值乘以服务器学习率 args.server_lr。
+            # 然后使用这些新权重更新模型。当前的实现方式直接在原地更新模型权重。
             for key in model.state_dict():
                 model.state_dict()[key] -= v[key] * args.server_lr
-
-            # Compute round average loss and accuracies
+            # 遍历模型的每个参数键，从模型当前的状态字典中减去 v 中相应键的值乘以服务器学习率 args.server_lr，从而更新服务器模型的权重。
+            # Compute round average loss and accuracies 计算平均损失和准确率
             if round % args.server_stats_every == 0:
+                # 如果当前轮次 round 能够被参数 args.server_stats_every 整除，这通常用于控制统计信息打印的频率。
                 loss_avg = loss_tot / sum(num_examples)
+                # 计算平均损失，即总损失 loss_tot 除以所有客户端样本数量的总和。
                 acc_avg = get_acc_avg(acc_types, clients, model, args.device)
-
+                # 调用 get_acc_avg 函数计算平均准确率，可能接受数据集类型、客户端列表、模型和设备作为参数。
                 if acc_avg[acc_types[1]] > acc_avg_best:
                     acc_avg_best = acc_avg[acc_types[1]]
-
+                # 如果测试集（通常是 acc_types 列表的第二个元素）的平均准确率高于之前记录的最佳准确率 acc_avg_best，则更新最佳准确率。
         # Save checkpoint
         checkpoint['model_state_dict'] = model.state_dict()
+        # 将模型的当前状态（包括所有参数和缓冲区）保存到检查点字典的 model_state_dict 键中。
         checkpoint['optim_state_dict'] = optim.state_dict()
+        # 将优化器的当前状态（包括所有优化参数和内部缓冲区）保存到检查点字典的 optim_state_dict 键中。
         checkpoint['sched_state_dict'] = sched.state_dict()
+        # 将学习率调度器的当前状态（包括所有调度参数）保存到检查点字典的 sched_state_dict 键中。
         checkpoint['last_round'] = round
+        # 将当前完成的训练轮次保存到检查点字典的 last_round 键中。
         checkpoint['iter'] = iter
+        # 将当前完成的迭代次数保存到检查点字典的 iter 键中。
         checkpoint['v'] = v
+        # 将累积更新（如果使用了动量方法）保存到检查点字典的 v 键中。
         checkpoint['acc_avg_best'] = acc_avg_best
+        # 将最佳平均准确率保存到检查点字典的 acc_avg_best 键中。
         checkpoint['torch_rng_state'] = torch.get_rng_state()
+        # 获取PyTorch的随机数生成器状态，并将其保存到检查点字典的 torch_rng_state 键中。
         checkpoint['numpy_rng_state'] = np.random.get_state()
+        # 获取NumPy的随机数生成器状态，并将其保存到检查点字典的 numpy_rng_state 键中。
         checkpoint['python_rng_state'] = random.getstate()
+        # 获取Python标准库 random 模块的随机数生成器状态，并将其保存到检查点字典的 python_rng_state 键中。
         torch.save(checkpoint, f'save/{args.name}')
-
-        # Print and log round stats
+        # 使用PyTorch的 torch.save 函数将整个检查点字典保存到文件中。
+        # 文件路径基于参数 args.name，通常包含训练配置的名称或标识，保存在 save 目录下。
+        # Print and log round stats 打印和记录每轮的统计信息
         if round % args.server_stats_every == 0:
             printlog_stats(args.quiet, logger, loss_avg, acc_avg, acc_types, lr, round+1, iter, args.iters)
-
-        # Stop training if the desired number of iterations has been reached
+        # 如果当前轮次 round 能够被参数 args.server_stats_every 整除，这意味着达到了记录统计信息的频率间隔。
+        # 调用 printlog_stats 函数来打印和记录统计信息，包括是否安静模式、日志记录器、平均损失、平均准确率、准确率类型、学习率、当前轮次、当前迭代次数和总迭代次数。
+        # Stop training if the desired number of iterations has been reached 检查是否达到了所需的迭代次数以停止训练。
         if args.iters is not None and iter >= args.iters: break
-
-        # Step scheduler
+        # 如果参数 args.iters 指定了迭代次数，并且当前迭代次数 iter 已经达到或超过这个值，则中断训练循环。
+        # Step scheduler 更新学习率调度器
         if type(sched) == schedulers.plateau_loss:
             sched.step(loss_avg)
         else:
             sched.step()
-
+        # 根据调度器的类型更新学习率。
+        # 如果调度器是 schedulers.plateau_loss 类型，则使用计算出的平均损失 loss_avg 来更新；否则，直接调用 step 方法更新。
     train_end_time = time()
-
-    # Compute final average test accuracy
+    # 在训练循环结束后，记录训练结束的时间。
+    # Compute final average test accuracy 计算最终的平均测试准确率
     acc_avg = get_acc_avg(['test'], clients, model, args.device)
-
+    # 调用 get_acc_avg 函数计算测试集上的平均准确率。
     test_end_time = time()
-
-    # Print and log test results
+    # 在测试结束后，记录测试结束的时间。
+    # Print and log test results 打印和记录测试结果。
     print('\nResults:')
     print(f'    Average test accuracy: {acc_avg["test"]:.3%}')
     print(f'    Train time: {timedelta(seconds=int(train_end_time-init_end_time))}')
     print(f'    Total time: {timedelta(seconds=int(time()-start_time))}')
-
+    # 打印和记录测试结果。
+    # 测试集上的平均准确率，保留三位小数。
+    # 训练阶段所花费的时间。
+    # 从训练开始到测试结束所花费的总时间。
     if logger is not None: logger.close()
+    # 如果使用了日志记录器 logger，则在最后关闭它，确保所有日志信息都被正确保存。
