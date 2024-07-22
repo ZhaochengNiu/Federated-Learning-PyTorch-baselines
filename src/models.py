@@ -33,6 +33,7 @@ from ghostnet import ghostnet as load_ghostnet
 from models_utils import *
 # 从models_utils模块导入所有内容，这可能是一个包含自定义模型工具和实用函数的模块。
 
+
 # From "Communication-Efficient Learning of Deep Networks from Decentralized Data"
 class mlp_mnist(nn.Module):
     # 定义了一个名为 mlp_mnist 的类，它继承自 PyTorch 的 nn.Module 类，这是所有神经网络模块的基类。
@@ -67,6 +68,7 @@ class mlp_mnist(nn.Module):
         x = self.classifier(x)
         # 将调整尺寸后的输入 x 通过 classifier 网络进行前向传播。
         return x
+
 
 # From "Communication-Efficient Learning of Deep Networks from Decentralized Data"
 class cnn_mnist(nn.Module):

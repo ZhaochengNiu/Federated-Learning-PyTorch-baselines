@@ -34,6 +34,8 @@ from utils import inference
 # 从 utils 模块导入 inference，这个函数可能用于模型推理。
 
 
+# 这个 Client 类提供了一个联邦学习客户端的基本框架，包括数据加载、模型训练、模型推理以及联邦重要性重加权（FedIR）的支持。
+# 通过这个类，可以实现客户端在联邦学习中的本地训练和推理任务。
 class Client(object):
     def __init__(self, args, datasets, idxs):
         # Client 类的构造函数接收三个参数：

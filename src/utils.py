@@ -236,44 +236,77 @@ def exp_details(args, model, datasets, splits):
             algo += ' (Drop Stragglers)'
         # 根据 args 参数构建算法名称字符串，包括联邦学习算法和附加的技术。
     f = io.StringIO()
+    # 创建一个 StringIO 对象 f，它是一个字符串缓冲区，可以像文件一样进行读写操作。
     with redirect_stdout(f):
+    # 使用 redirect_stdout 上下文管理器将标准输出重定向到 f 对象。
+    # 这意味着在这段代码块中执行的所有 print 函数调用将输出到 f 而不是控制台。
         print('Experiment summary:')
+        # 打印文本 "Experiment summary:"
         print(f'    Algorithm:')
+        # 打印文本 "Algorithm:"，并缩进。
         print(f'        Algorithm: {algo}')
+        # 打印算法名称，其中 algo 是之前定义的算法名称字符串。
         print(f'        ' + (f'Rounds: {args.rounds}' if args.iters is None else f'Iterations: {args.iters}'))
+        # 根据 args.iters 是否为 None，打印 "Rounds:" 或 "Iterations:"，后跟相应的值。
         print(f'        Clients: {args.num_clients}')
+        # 打印参与联邦学习训练的客户端数量。
         print(f'        Fraction of clients: {args.frac_clients}')
+        # 打印每轮参与训练的客户端比例。
         print(f'        Client epochs: {args.epochs}')
+        # 打印客户端上每个数据集进行训练的轮次。
         print(f'        Training batch size: {args.train_bs}')
+        # 打印训练时使用的批量大小。
         print(f'        System heterogeneity: {args.hetero}')
+        # 打印系统异构性，这可能指的是客户端之间的硬件或数据分布差异。
         print(f'        Server learning rate: {args.server_lr}')
+        # 打印服务器端的学习率。
         print(f'        Server momentum (FedAvgM): {args.server_momentum}')
+        # 打印服务器端的动量参数，该参数通常用于 FedAvgM 算法。
         print(f'        Virtual client size (FedVC): {args.vc_size}')
+        # 打印虚拟客户端的大小，这是 FedVC 算法中的参数。
         print(f'        Mu (FedProx): {args.mu}')
+        # 打印 FedProx 算法中的 Mu 参数。
         print()
 
         print('    Dataset and split:')
+        # 打印数据集和拆分的标题。
         print('        Training set:')
-        print('            ' + str(datasets['train']).replace('\n','\n            '))
+        # 打印训练数据集的标题。
+        print('            ' + str(datasets['train']).replace('\n', '\n            '))
+        # 打印训练数据集的详细信息，使用 str.replace 来格式化换行。
         if datasets['valid'] is not None:
+            # 检查是否存在验证数据集。
             print('        Validation set:')
-            print('            ' + str(datasets['valid']).replace('\n','\n            '))
+            # 如果存在，打印验证数据集的标题。
+            print('            ' + str(datasets['valid']).replace('\n', '\n            '))
+            # 打印验证数据集的详细信息，使用 str.replace 来格式化换行。
         print('        Test set:')
+        # 打印测试数据集的标题。
         print('            ' + str(datasets['test']).replace('\n','\n            '))
+        # 打印测试数据集的详细信息，使用 str.replace 来格式化换行。
         print(f'        Identicalness: {args.iid} (EMD = {splits["train"].emd["class"]})')
+        # 打印数据集的类别分布一致性，包括是否为 I.I.D.（独立同分布）和类别分布的 EMD 值。
         print(f'        Balance: {args.balance} (EMD = {splits["train"].emd["client"]})')
+        # 打印数据集的客户端分布平衡性，包括平衡参数和客户端分布的 EMD 值。
         print()
 
         print('    Scheduler: %s' % (str(scheduler).replace('\n', '\n    ')))
+        # 打印调度器的详细信息，使用 str.replace 来格式化换行。
         print()
 
         print('    Model:')
+        # 打印模型的标题。
         print(summ)
         print()
 
         print('    Other:')
+        # 打印其他信息的标题。
         print(f'        Test batch size: {args.test_bs}')
+        # 打印测试时使用的批量大小。
         print(f'        Random seed: {args.seed}')
+        # 打印随机种子。
         print(f'        Device: {device}')
-
+        # 打印使用的设备信息。
     return f.getvalue()
+    # 在 redirect_stdout 上下文管理器结束后，返回 f 缓冲区中的所有内容作为字符串。
+    # 这个字符串包含了所有被重定向的打印输出，通常用于记录或进一步处理。
