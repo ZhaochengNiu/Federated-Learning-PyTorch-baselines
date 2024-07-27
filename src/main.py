@@ -19,7 +19,7 @@
 '''
 
 import random, re
-# 导入Python标准库中的random模块，提供生成随机数的函数；re模块，提供正则表达式的功能。
+# 导入 Python 标准库中的 random 模块，提供生成随机数的函数；re 模块，提供正则表达式的功能。
 from copy import deepcopy
 # 从copy模块导入deepcopy函数，用于深度复制对象。
 from os import environ
@@ -87,6 +87,7 @@ if __name__ == '__main__':
         # 更新 args.iters 参数为从检查点获取的 iters 值，以便继续训练。
         args.device = device
         # 更新 args.device 参数为从检查点获取的 device 值，确保训练在正确的设备上继续进行。
+
     ## Initialize RNGs and ensure reproducibility
     if args.seed is not None:
         # 如果命令行参数 args.seed 被设置了（即不是 None），则执行以下代码块。
