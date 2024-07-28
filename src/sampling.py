@@ -123,6 +123,13 @@ def get_split(dataset, q_class, q_client):
     classes = set(range(num_classes))
     idxs_classes = [set((np.array(dataset.targets) == cls).nonzero()[0]) for cls in range(num_classes)]
     # 创建一个包含所有类别的集合 classes，以及一个列表 idxs_classes，其中包含每个类别的样本索引集合。
+    # 这段代码的目的是根据数据集中不同类别的标签，将数据集划分成多个集合，每个集合只包含特定类别的样本索引。具体步骤如下：
+    # dataset.targets: 这是一个包含数据集所有样本标签的列表或数组。例如，如果数据集中有 1000 个样本，每个样本有一个标签，则 dataset.targets 是一个长度为 1000 的列表，里面的元素是每个样本对应的标签。
+    # range(num_classes): 这是一个从 0 到 num_classes-1 的整数序列。num_classes 是数据集中类别的总数。
+    # (np.array(dataset.targets) == cls): 对于每个类别 cls，这会生成一个布尔数组，数组中的每个元素表示 dataset.targets 中对应位置的样本是否属于类别 cls。如果样本属于类别 cls，则对应位置为 True，否则为 False。
+    # (np.array(dataset.targets) == cls).nonzero()[0]: nonzero() 函数返回所有非零元素的索引。在这种情况下，它返回布尔数组中值为 True 的索引，即属于类别 cls 的所有样本的索引。
+    # set((np.array(dataset.targets) == cls).nonzero()[0]): 将这些索引转换为集合，集合中的每个元素都是一个样本索引，这些样本都属于类别 cls。
+    # [... for cls in range(num_classes)]: 使用列表推导式，将上述过程应用于每个类别，生成一个包含多个集合的列表，每个集合包含属于特定类别的样本索引。
     num_images = len(dataset)
     # 获取数据集中的图像总数。
     while(1):
