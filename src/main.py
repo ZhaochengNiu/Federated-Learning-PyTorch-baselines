@@ -119,9 +119,13 @@ if __name__ == '__main__':
     if not args.resume:
         # 如果 args.resume 参数为 False（即不是从检查点恢复训练），则执行以下代码块。
         # cifar
-        # datasets = getattr(datasets, args.dataset)(args, args.dataset_args)
+        datasets = getattr(datasets, args.dataset)(args, args.dataset_args)
+        # datasets = getattr(datasets, args.dataset)(args, args.dataset_args) 这行代码的意思是：
+        # 从 datasets 对象中，动态获取名称为 args.dataset 的属性（这通常是一个类或函数）。
+        # 然后，使用 args 和 args.dataset_args 作为参数来实例化或调用这个类/函数。
+        # 最终将结果赋值给变量 datasets。
         # mnist
-        datasets = getattr(datasets, args.dataset)(args)
+        # datasets = getattr(datasets, args.dataset)(args)
         # 根据 args.dataset 参数的值，动态获取 datasets 模块中相应的数据集类，并使用该类创建数据集实例。
         # args.dataset_args 可能包含一些额外的参数，用于初始化数据集。
         splits = get_splits(datasets, args.num_clients, args.iid, args.balance)
@@ -336,7 +340,8 @@ if __name__ == '__main__':
             # 这部分代码被注释掉了，但它的意图是创建服务器模型的新权重，通过从当前模型权重中减去 v 中的值乘以服务器学习率 args.server_lr。
             # 然后使用这些新权重更新模型。当前的实现方式直接在原地更新模型权重。
             for key in model.state_dict():
-                model.state_dict()[key] -= v[key] * args.server_lr
+                # model.state_dict()[key] -= v[key] * args.server_lr
+                model.state_dict()[key] = model.state_dict()[key].float() - v[key] * args.server_lr
             # 遍历模型的每个参数键，从模型当前的状态字典中减去 v 中相应键的值乘以服务器学习率 args.server_lr，从而更新服务器模型的权重。
             # Compute round average loss and accuracies 计算平均损失和准确率
             if round % args.server_stats_every == 0:

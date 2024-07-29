@@ -107,7 +107,7 @@ def args_parser():
     #   VC_SIZE     use FedVC algorithm with virtual client size VC_SIZE (default: None)
     # Dataset and split arguments
     args_dataset_split = parser.add_argument_group('dataset and split arguments')
-    args_dataset_split.add_argument('--dataset', type=str, default='fmnist', choices=[f[0] for f in getmembers(datasets, isfunction) if f[1].__module__ == 'datasets'],
+    args_dataset_split.add_argument('--dataset', type=str, default='cifar10', choices=[f[0] for f in getmembers(datasets, isfunction) if f[1].__module__ == 'datasets'],
                         help="dataset, place yours in datasets.py")
     #   --dataset
     #   {cifar10,fmnist,mnist} dataset, place yours in datasets.py (default: cifar10)
@@ -128,7 +128,7 @@ def args_parser():
     #   --balance
     #   BALANCE balance of client distributions (default: inf) Model, optimizer and scheduler arguments
     args_model_optim_sched = parser.add_argument_group('model, optimizer and scheduler arguments')
-    args_model_optim_sched.add_argument('--model', type=str, default='lenet5', choices=[c[0] for c in getmembers(models, isclass) if c[1].__module__ == 'models'],
+    args_model_optim_sched.add_argument('--model', type=str, default='mobilenet_v3', choices=[c[0] for c in getmembers(models, isclass) if c[1].__module__ == 'models'],
                         help="model, place yours in models.py")
     #   --model
     #   {cnn_cifar10,cnn_mnist,efficientnet,ghostnet,lenet5,lenet5_orig,mlp_mnist,mnasnet,mobilenet_v3} model,

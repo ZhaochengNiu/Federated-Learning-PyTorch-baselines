@@ -376,6 +376,9 @@ class mnasnet(nn.Module):
             #  如果冻结模型权重，则将模型的所有参数的 requires_grad 属性设置为 False，这样在训练过程中这些参数不会更新。
             self.model.classifier[1] = nn.Linear(self.model.classifier[1].in_features, num_classes)
             # 替换模型的分类器层，以匹配输出类别的数量。
+            # 在你提供的代码片段中，你正在尝试替换模型中的分类器（classifier）的第二层（索引为1的层）为一个新的nn.Linear层。
+            # 这个操作通常是在模型微调或修改模型结构时进行的。nn.Linear是一个全连接层，用于线性变换输入特征。
+            # 其中原in_features是被替换层的输入特征数量，可以通过self.model.classifier[1].in_features获得（如果它是nn.Linear类型的话）。
         else:
             self.model = tvmodels.mnasnet.MNASNet(alpha=width, num_classes=num_classes, dropout=dropout)
             # 如果不使用预训练模型，则直接初始化一个 MNASNet 模型，指定宽度因子、输出类别数量和 dropout 比率。
@@ -412,6 +415,8 @@ class ghostnet(nn.Module):
         if pretrained:
             # 如果使用预训练模型：
             if width != 1:
+                # 在深度学习模型的上下文中，width通常指的是模型的宽度因子或扩展比率。这个因子用于控制模型的宽度，
+                # 即网络层中的通道数或神经元的数量。通过改变宽度因子，可以调整模型的大小和复杂度，从而影响模型的性能和计算效率。
                 raise ValueError('Unsupported width for pretrained GhostNet: %s' % width)
             # 检查模型宽度因子是否为 1，因为预训练的 GhostNet 模型通常只有一种宽度因子。
             self.model = load_ghostnet(width=1, dropout=dropout)
@@ -511,6 +516,7 @@ class mobilenet_v3(nn.Module):
         # 重新初始化模型的第一个分类器层，保持其输入和输出特征数量不变。
         self.model.classifier[3] = nn.Linear(self.model.classifier[3].in_features, num_classes)
         # 替换模型的最后一个分类器层，将输出特征数量更改为输出类别的数量 num_classes。
+
     def forward(self, x):
         x = self.resize(x)
         # 将输入 x 通过 Resize 变换调整尺寸。
