@@ -52,6 +52,8 @@ from sampling import get_splits, get_splits_fig
 from client import Client
 # 从client模块导入Client类，这个类可能定义了客户端的行为，用于模拟联邦学习中的客户端。
 
+# tensorboard --logdir=D:\niu\code\Federated-Learning-PyTorch-baselines\src\runs
+
 if __name__ == '__main__':
     # Start timer
     # 开始计时，记录脚本开始执行的时间。
