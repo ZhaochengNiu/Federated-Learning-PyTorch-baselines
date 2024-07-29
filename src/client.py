@@ -162,11 +162,18 @@ class Client(object):
 
         # Compute model update
         model_update = {}
+        # 这里初始化了一个空字典 model_update，用于存储模型更新。模型更新将包含每个参数的差异。
         for key in model.state_dict():
             model_update[key] = torch.sub(model_server.state_dict()[key], model.state_dict()[key])
-        # 计算模型更新。
+        # 这段代码计算模型更新：
+        # 使用 for key in model.state_dict() 遍历模型 model 的所有参数。
+        # model.state_dict() 返回一个包含模型所有参数的字典，键是参数名称，值是参数的张量。
+        # 对于每个参数，计算服务器模型 (model_server) 和本地模型 (model) 之间的差异。
+        # model_server.state_dict()[key] 和 model.state_dict()[key] 分别获取服务器模型和本地模型对应参数的张量。
+        # 将计算出的差异存储在 model_update 字典中。
         return model_update, len(train_loader.dataset), iter, loss_running
         # 返回模型更新、数据集大小、迭代次数和运行平均损失。
+
     def inference(self, model, type, device):
         # inference 方法接收三个参数：
         # model：要进行推理的模型。
